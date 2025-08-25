@@ -1,28 +1,32 @@
 # 🛍️ E-commerce Product API (Django + DRF)
 
-This project is a **RESTful API** for managing products on an e-commerce platform.  
+This project is a **RESTful API** for managing products in an e-commerce platform.  
 It allows users to **register, authenticate, and manage products (CRUD)**, while supporting **search, filtering, and pagination**.  
-Built with **Django + Django REST Framework**, and deployable to **Heroku or PythonAnywhere**.  
+Built with **Django + Django REST Framework**, and connected to **PostgreSQL**.  
 
 ---
 
 ## 🚀 Features
 
-- **User Management (CRUD)**
-  - Register with username, email, password
-  - JWT Authentication (Login/Logout via tokens)
+- **User Management**
+  - Register with username, email, and password
+  - Login to obtain a **DRF Token**
   - Only authenticated users can create/update/delete products
-  - Admin can manage all users
+  - Admins can manage all users and categories
 
-- **Product Management (CRUD)**
-  - Name, Description, Price, Category, Stock Quantity, Image URL, Created Date
-  - Validation for required fields (price > 0, stock ≥ 0, name required)
+- **Product Management**
+  - Fields: Name, Description, Price, Category, Stock Quantity, Image URL, Created Date
+  - Validation: price > 0, stock ≥ 0, name required
   - Products linked to categories & owners (users)
 
+- **Category Management**
+  - Create, update, delete categories (admin only)
+  - Products assigned to categories
+
 - **Search & Filtering**
-  - Search by product name or category (partial matches allowed)
+  - Search by product name or category
   - Filter by:
-    - Category (slug)
+    - Category
     - Price range (`price_min`, `price_max`)
     - Stock availability (`in_stock=true/false`)
   - Ordering by price, date, or name
@@ -32,26 +36,29 @@ Built with **Django + Django REST Framework**, and deployable to **Heroku or Pyt
   - Configurable in settings
 
 - **Authentication**
-  - JWT (access & refresh tokens) using `djangorestframework-simplejwt`
+  - Uses **DRF Token Authentication**
+  - Tokens are obtained at login and passed in headers:
+    ```
+    Authorization: Token your_token_here
+    ```
 
 - **Deployment Ready**
-  - Configured for **Heroku** (Gunicorn, Whitenoise, Postgres support)
-  - Can also run on **PythonAnywhere**
+  - Works with **PostgreSQL**
+  - Deployable on **Heroku** or **Render**
 
 ---
 
 ## 🗂️ Tech Stack
 
-- **Backend**: Django, Django REST Framework
-- **Auth**: JWT (SimpleJWT)
-- **Database**: SQLite (dev), Postgres (prod-ready)
-- **Deployment**: Heroku / PythonAnywhere
-- **Other**: Django Filters, Pillow, Decouple, Whitenoise, Gunicorn
+- **Backend**: Django, Django REST Framework  
+- **Auth**: DRF Token Authentication  
+- **Database**: PostgreSQL (production), SQLite (development)  
+- **Deployment**: Heroku / Render  
+- **Other**: Django Filters, Pillow, Decouple, Whitenoise, Gunicorn  
 
 ---
 
 ## 📊 ERD (Entity Relationship Diagram)
-
 
 **Relationships**:
 - `User 1—* Product` (owner)
@@ -62,15 +69,15 @@ Built with **Django + Django REST Framework**, and deployable to **Heroku or Pyt
 ## 🔑 API Endpoints
 
 ### Auth
-| Method | Endpoint              | Description |
-|--------|-----------------------|-------------|
-| POST   | `/api/auth/token/`    | Login (get JWT token) |
-| POST   | `/api/auth/token/refresh/` | Refresh JWT token |
+| Method | Endpoint            | Description |
+|--------|---------------------|-------------|
+| POST   | `/api/auth/register/` | Register a new user |
+| POST   | `/api/auth/login/`    | Login and obtain token |
+| POST   | `/api/auth/logout/`   | Logout and invalidate token |
 
 ### Users
 | Method | Endpoint         | Description |
 |--------|------------------|-------------|
-| POST   | `/api/users/`    | Register a new user |
 | GET    | `/api/users/`    | List all users (admin only) |
 | GET    | `/api/users/{id}/` | Get user details (self or admin) |
 | PUT    | `/api/users/{id}/` | Update user info |
@@ -80,9 +87,9 @@ Built with **Django + Django REST Framework**, and deployable to **Heroku or Pyt
 | Method | Endpoint             | Description |
 |--------|----------------------|-------------|
 | GET    | `/api/categories/`   | List categories |
-| POST   | `/api/categories/`   | Create category |
-| PUT    | `/api/categories/{slug}/` | Update category |
-| DELETE | `/api/categories/{slug}/` | Delete category |
+| POST   | `/api/categories/`   | Create category (admin only) |
+| PUT    | `/api/categories/{id}/` | Update category (admin only) |
+| DELETE | `/api/categories/{id}/` | Delete category (admin only) |
 
 ### Products
 | Method | Endpoint                 | Description |
