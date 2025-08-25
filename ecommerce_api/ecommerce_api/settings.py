@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     # Local apps
-    "core",
     "catalog",
     "users",
 ]
