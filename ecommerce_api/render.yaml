@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn ecommerce_api.wsgi"
+    startCommand: "gunicorn ecommerce_api.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: ecommerce_api.settings
