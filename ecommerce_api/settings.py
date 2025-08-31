@@ -1,14 +1,16 @@
 from pathlib import Path
 from decouple import config
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config("SECRET_KEY")
 
-DEBUG = False
+SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret")
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -19,11 +21,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Third-party
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
-    # Local apps
     "catalog",
     "users",
 ]
@@ -60,16 +60,7 @@ WSGI_APPLICATION = "ecommerce_api.wsgi.application"
 
 
 # Database
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
-    }
-}
+DATABASES = {"default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))}
 
 
 # Password validation
@@ -89,8 +80,9 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
