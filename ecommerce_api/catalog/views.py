@@ -10,8 +10,11 @@ from .filters import ProductFilter
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    lookup_field = "slug"
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:  # public routes
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]  #
 
 
 class ProductViewSet(viewsets.ModelViewSet):

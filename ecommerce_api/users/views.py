@@ -1,25 +1,37 @@
-from rest_framework import viewsets, permissions
-from .models import User
-from .serializers import UserSerializer, UserReadSerializer
+# views.py
+from django.contrib.auth.models import User
+from rest_framework import generics, permissions, viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from .serializers import UserSerializer
 
+from django.contrib.auth import get_user_model
 
-class IsSelfOrAdmin(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return request.user.is_staff or obj.id == request.user.id
+User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
-            return UserSerializer
-        return UserReadSerializer
 
-    def get_permissions(self):
-        if self.action in ["list", "destroy"]:
-            return [permissions.IsAdminUser()]
-        if self.action in ["retrieve", "update", "partial_update"]:
-            return [permissions.IsAuthenticated(), IsSelfOrAdmin()]
-        return super().get_permissions()
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def login_view(request):
+    from django.contrib.auth import authenticate
+
+    username = request.data.get("username")
+    password = request.data.get("password")
+    user = authenticate(username=username, password=password)
+    if user:
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
+    return Response({"error": "Invalid credentials"}, status=400)
